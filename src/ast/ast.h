@@ -4,23 +4,23 @@
 #define MAX_ARGS 10
 #define MAX_BODY 10
 
-// Fact (баримт)
+// Fact struct
 typedef struct {
-    char* name;            // parent
-    char* args[MAX_ARGS];   // ["bat","bold"]
+    char* name;
+    char* args[MAX_ARGS];
     int arg_count;
 } Fact;
 
-// Rule (дүрэм)
+// Rule struct
 typedef struct {
-    char* name;               // grandparent
-    char* args[MAX_ARGS];      // ["X","Y"]
+    char* name;
+    char* args[MAX_ARGS];
     int arg_count;
-    char* body[MAX_BODY];      // ["parent(X,Z)", "parent(Z,Y)"]
+    char* body[MAX_BODY];
     int body_count;
 } Rule;
 
-// Query (асуулт)
+// Query struct
 typedef struct {
     char* name;
     char* args[MAX_ARGS];

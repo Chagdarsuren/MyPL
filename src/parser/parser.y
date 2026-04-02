@@ -8,10 +8,11 @@
 extern int yylex();
 void yyerror(const char* s);
 
+// Temporary storage for parser actions
 char* args_array[10];
-int arg_count;
+int arg_count = 0;
 char* body_array[10];
-int body_count;
+int body_count = 0;
 %}
 
 %union { char* str; }
@@ -33,18 +34,27 @@ statements:
 ;
 
 statement:
-      fact DOT { Fact* f=create_fact($1,args_array,arg_count); add_fact(f); arg_count=0; }
-    | rule DOT { Rule* r=create_rule($1,args_array,arg_count,body_array,body_count); add_rule(r); arg_count=body_count=0; }
+    fact DOT { Fact* f=create_fact($1,args_array,arg_count); add_fact(f); arg_count=0; }
+  | rule DOT { Rule* r=create_rule($1,args_array,arg_count,body_array,body_count); add_rule(r); arg_count=body_count=0; }
+  | query DOT { Query* q=create_query($2,args_array,arg_count); eval_query(q); arg_count=0; }
 ;
 
+// Fact: IDENT(args)
 fact:
     IDENT LPAREN arguments RPAREN { $$=$1; }
 ;
 
+// Rule: IDENT(args) :- body_items
 rule:
     IDENT LPAREN arguments RPAREN COLON_DASH body_items { $$=$1; }
 ;
 
+// Query: ?- IDENT(args)
+query:
+    QUERY IDENT LPAREN arguments RPAREN { $$=$2; }
+;
+
+// Arguments list
 arguments:
       argument
     | argument COMMA arguments
@@ -54,13 +64,14 @@ argument:
     IDENT { args_array[arg_count++]=$1; }
 ;
 
+// Body items for rule
 body_items:
       body_item
     | body_item COMMA body_items
 ;
 
 body_item:
-    IDENT LPAREN arguments RPAREN { body_array[body_count++]=strdup(yytext); }
+    IDENT LPAREN arguments RPAREN { body_array[body_count++] = strdup(yytext); }
 ;
 
 %%

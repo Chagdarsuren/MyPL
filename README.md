@@ -59,3 +59,9 @@ II. Хэлний дизайн ба семантик
 · Rule
 
 · Query
+
+· Pattern matching / search
+
+Жишээ хэлбэр:
+
+parent(bat, dorj). ancestor(X,Y) :- parent(X,Y). ancestor(X,Y) :- parent(X,Z), ancestor(Z,Y)

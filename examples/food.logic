@@ -1,0 +1,27 @@
+fruit(apple).
+fruit(banana).
+fruit(orange).
+fruit(grape).
+
+vegetable(carrot).
+vegetable(broccoli).
+vegetable(spinach).
+
+healthy(apple).
+healthy(banana).
+healthy(carrot).
+healthy(broccoli).
+healthy(spinach).
+
+edible(X) :- fruit(X).
+edible(X) :- vegetable(X).
+
+good_for_health(X) :- healthy(X).
+
+?- fruit(apple).
+?- vegetable(carrot).
+?- edible(apple).
+?- edible(carrot).
+?- edible(pizza).
+?- good_for_health(apple).
+?- good_for_health(carrot).

@@ -1,0 +1,21 @@
+# Test 10: Variable binding
+teaches(professor_smith, algebra).
+teaches(professor_smith, calculus).
+teaches(professor_jones, biology).
+teaches(professor_jones, chemistry).
+
+student_takes(alice, algebra).
+student_takes(alice, calculus).
+student_takes(bob, biology).
+student_takes(bob, chemistry).
+
+course(algebra).
+course(calculus).
+course(biology).
+course(chemistry).
+
+?- teaches(professor_smith, algebra).
+?- teaches(professor_smith, biology).
+?- course(algebra).
+?- student_takes(alice, algebra).
+?- student_takes(alice, biology).

@@ -1,0 +1,13 @@
+# Test 2: Simple rule (non-recursive)
+parent(john, mary).
+parent(john, tom).
+parent(mary, ann).
+parent(tom, joe).
+
+child(X, Y) :- parent(Y, X).
+
+?- child(mary, john).
+?- child(tom, john).
+?- child(ann, mary).
+?- child(john, mary).
+?- child(joe, ann).

@@ -1,0 +1,16 @@
+# Test 14: Simple facts with variables
+color(apple, red).
+color(grass, green).
+color(sky, blue).
+color(snow, white).
+
+item(apple).
+item(grass).
+item(sky).
+item(snow).
+
+?- color(apple, red).
+?- color(apple, green).
+?- color(grass, green).
+?- item(apple).
+?- item(dog).

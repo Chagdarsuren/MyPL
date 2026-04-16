@@ -1,0 +1,16 @@
+# Test 8: Multiple rules for same predicate
+mammal(dog).
+mammal(cat).
+mammal(whale).
+
+bird(eagle).
+bird(penguin).
+
+animal(X) :- mammal(X).
+animal(X) :- bird(X).
+
+?- mammal(dog).
+?- bird(eagle).
+?- animal(dog).
+?- animal(eagle).
+?- animal(fish).

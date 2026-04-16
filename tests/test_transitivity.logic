@@ -1,0 +1,12 @@
+# Test 11: Transitivity
+greater_than(5, 3).
+greater_than(3, 1).
+greater_than(10, 5).
+
+transitivity(X, Y) :- greater_than(X, Y).
+transitivity(X, Y) :- greater_than(X, Z), transitivity(Z, Y).
+
+?- greater_than(5, 3).
+?- transitivity(5, 1).
+?- transitivity(10, 3).
+?- transitivity(5, 10).

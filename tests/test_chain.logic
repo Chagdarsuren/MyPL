@@ -1,0 +1,15 @@
+# Test 9: Chain of rules
+step1(input).
+step2(processed).
+step3(completed).
+
+is_valid(X) :- step1(X).
+is_valid(X) :- step2(X).
+is_valid(X) :- step3(X).
+
+status(X) :- is_valid(X).
+
+?- is_valid(input).
+?- is_valid(processed).
+?- is_valid(error).
+?- status(completed).

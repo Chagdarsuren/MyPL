@@ -1,0 +1,16 @@
+# Test 12: Binary relations
+brother(tom, bob).
+brother(bob, tom).
+brother(ann, joe).
+
+sister(ann, tom).
+sister(tom, ann).
+
+sibling(X, Y) :- brother(X, Y).
+sibling(X, Y) :- sister(X, Y).
+
+?- brother(tom, bob).
+?- brother(ann, joe).
+?- sibling(tom, bob).
+?- sibling(ann, tom).
+?- sibling(bob, ann).

@@ -1,0 +1,10 @@
+# Test 19: Symmetric relations
+love(romeo, juliet).
+love(juliet, romeo).
+
+mutual_love(X, Y) :- love(X, Y), love(Y, X).
+
+?- love(romeo, juliet).
+?- mutual_love(romeo, juliet).
+?- mutual_love(juliet, romeo).
+?- love(romeo, paris).

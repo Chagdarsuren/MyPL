@@ -1,0 +1,22 @@
+person(alice).
+person(bob).
+person(charlie).
+person(diana).
+person(eve).
+
+friend(alice, bob).
+friend(bob, charlie).
+friend(charlie, diana).
+friend(diana, eve).
+
+knows(X, Y) :- friend(X, Y).
+knows(X, Y) :- friend(Y, X).
+
+connection(X, Y) :- knows(X, Y).
+connection(X, Y) :- knows(X, Z), knows(Z, Y).
+
+?- friend(alice, bob).
+?- knows(alice, bob).
+?- knows(bob, alice).
+?- connection(alice, charlie).
+?- connection(alice, diana).

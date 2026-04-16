@@ -10,7 +10,7 @@
 ","                      { return COMMA; }
 "."                      { return DOT; }
 ":-"                     { return COLON_DASH; }
-"\\?-"                   { return QUERY; }
+"?-"                     { return QUERY; }
 [ \t\r\n]+               ;
 
 %%

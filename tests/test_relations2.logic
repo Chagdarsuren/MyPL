@@ -1,0 +1,13 @@
+# Test 17: Two-argument recursive rules
+parent_of(ann, betty).
+parent_of(betty, charlie).
+parent_of(charlie, diana).
+
+grandparent_of(X, Y) :- parent_of(X, Z), parent_of(Z, Y).
+
+great_grandparent(X, Y) :- parent_of(X, Z), grandparent_of(Z, Y).
+
+?- parent_of(ann, betty).
+?- grandparent_of(ann, charlie).
+?- great_grandparent(ann, diana).
+?- great_grandparent(betty, diana).

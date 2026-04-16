@@ -1,0 +1,18 @@
+# Test 13: Rules with many body goals
+place(paris).
+place(london).
+place(rome).
+
+in_france(X) :- place(X).
+in_france(paris).
+
+capital(paris, france).
+capital(london, england).
+capital(rome, italy).
+
+european_capital(X, Y) :- capital(X, Y), place(X).
+
+?- place(paris).
+?- capital(paris, france).
+?- in_france(paris).
+?- european_capital(london, england).

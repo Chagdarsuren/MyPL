@@ -1,0 +1,20 @@
+# Test 6: Simple numbers and facts
+number(1).
+number(2).
+number(3).
+number(4).
+number(5).
+
+even(2).
+even(4).
+
+odd(1).
+odd(3).
+odd(5).
+
+?- number(1).
+?- number(6).
+?- even(2).
+?- even(3).
+?- odd(1).
+?- odd(2).

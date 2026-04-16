@@ -1,0 +1,13 @@
+# Test 18: Simple pattern matching
+owns(john, book).
+owns(john, pen).
+owns(mary, book).
+owns(mary, lamp).
+
+property(X, Y) :- owns(X, Y).
+
+?- owns(john, book).
+?- owns(john, pen).
+?- owns(john, lamp).
+?- property(john, book).
+?- property(mary, pen).

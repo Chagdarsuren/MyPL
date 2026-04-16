@@ -1,0 +1,15 @@
+# Test 15: Basic queries
+database(user1).
+database(user2).
+database(admin).
+
+admin(admin).
+
+is_user(X) :- database(X).
+
+?- database(user1).
+?- database(admin).
+?- database(user3).
+?- is_user(user1).
+?- is_user(admin).
+?- is_user(hacker).

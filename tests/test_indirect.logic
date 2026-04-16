@@ -1,0 +1,14 @@
+# Test 16: Indirect inference
+engine(car).
+engine(plane).
+engine(boat).
+
+vehicle(X) :- engine(X).
+
+machine(X) :- vehicle(X).
+
+?- engine(car).
+?- vehicle(car).
+?- vehicle(bicycle).
+?- machine(car).
+?- machine(plane).

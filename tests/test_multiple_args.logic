@@ -1,0 +1,10 @@
+# Test 4: Multiple argument unification
+likes(mary, food).
+likes(mary, wine).
+likes(john, wine).
+likes(john, mary).
+
+?- likes( mary, wine).
+?- likes(john, wine).
+?- likes(john, food).
+?- likes(mary, john).

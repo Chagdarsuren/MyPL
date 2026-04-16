@@ -1,0 +1,15 @@
+# Test 7: Deep recursion
+linked(a, b).
+linked(b, c).
+linked(c, d).
+linked(d, e).
+linked(e, f).
+
+path(X, Y) :- linked(X, Y).
+path(X, Y) :- linked(X, Z), path(Z, Y).
+
+?- path(a, b).
+?- path(a, c).
+?- path(a, f).
+?- path(d, f).
+?- path(f, a).

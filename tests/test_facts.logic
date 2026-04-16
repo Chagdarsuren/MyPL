@@ -1,0 +1,13 @@
+animal(dog).
+animal(cat).
+animal(bird).
+
+color(red).
+color(blue).
+color(green).
+
+?- animal(dog).
+?- animal(cat).
+?- animal(fish).
+?- color(red).
+?- color(yellow).

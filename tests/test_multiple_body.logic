@@ -1,0 +1,14 @@
+# Test 5: Rule with multiple body goals
+father(tom, bob).
+father(bob, ann).
+
+mother(liz, bob).
+mother(ann, joe).
+
+brother(X, Y) :- father(Z, X), father(Z, Y).
+
+grandparent(X, Y) :- father(X, Z), father(Z, Y).
+
+?- brother(bob, X).
+?- father(tom, bob).
+?- grandparent(tom, ann).

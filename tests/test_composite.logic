@@ -1,0 +1,21 @@
+# Test 20: Composite rules
+teacher(prof_smith).
+teacher(prof_jones).
+
+course(math).
+course(history).
+
+teaches(prof_smith, math).
+teaches(prof_jones, history).
+
+expert(prof_smith).
+expert(prof_jones).
+
+is_teacher(X) :- teacher(X).
+qualified_teacher(X) :- teacher(X), expert(X).
+
+?- teacher(prof_smith).
+?- teaches(prof_smith, math).
+?- is_teacher(prof_smith).
+?- qualified_teacher(prof_smith).
+?- qualified_teacher(prof_jones).

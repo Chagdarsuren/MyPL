@@ -4,11 +4,13 @@
 int yyparse();
 void run_interpreter();
 
-int main() {
+int main()
+{
     printf("=== MyPL ===\n");
     printf("Parsing input...\n");
 
-    if(yyparse()!=0) {
+    if (yyparse() != 0)
+    {
         printf("Parse error!\n");
         return 1;
     }

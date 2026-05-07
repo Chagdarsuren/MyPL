@@ -1,0 +1,3 @@
+# Negative: a fact without the trailing '.'
+parent(bat, bold)
+parent(bold, dorj).

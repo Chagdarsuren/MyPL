@@ -1,0 +1,2 @@
+# Negative: '@' is not a valid token in MyPL
+parent(bat, b@d).

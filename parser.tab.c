@@ -97,27 +97,31 @@
 #include "src/interpreter/interpreter.h"
 
 extern int yylex();
+extern int yylineno;
 void yyerror(const char* s);
 
-// Temporary storage for parser actions
-char* args_array[10];
-int arg_count = 0;
+int parse_error_count = 0;
 
-char* temp_args[10];
-int temp_arg_count = 0;
+/* Parser action scratch buffers */
+static char* args_array[MAX_ARGS];
+static int   arg_count = 0;
 
-char* body_array[10];
-int body_count = 0;
+static char* temp_args[MAX_ARGS];
+static int   temp_arg_count = 0;
 
-// Helper function to construct body item string
-char* construct_body_item(char* name, char* args[], int count) {
-    char buf[256];
-    int pos = sprintf(buf, "%s(", name);
+static char* body_array[MAX_BODY];
+static int   body_count = 0;
+
+/* Helper: serialise a body item back to "name(a,b,c)" form. */
+static char* construct_body_item(const char* name, char* args[], int count) {
+    char buf[512];
+    int  pos = snprintf(buf, sizeof(buf), "%s(", name);
     for (int i = 0; i < count; i++) {
-        pos += sprintf(buf + pos, "%s", args[i]);
-        if (i < count - 1) pos += sprintf(buf + pos, ",");
+        pos += snprintf(buf + pos, sizeof(buf) - pos, "%s", args[i]);
+        if (i < count - 1)
+            pos += snprintf(buf + pos, sizeof(buf) - pos, ",");
     }
-    pos += sprintf(buf + pos, ")");
+    snprintf(buf + pos, sizeof(buf) - pos, ")");
     return strdup(buf);
 }
 
@@ -142,10 +146,10 @@ char* construct_body_item(char* name, char* args[], int count) {
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 34 "src/parser/parser.y"
+#line 38 "src/parser/parser.y"
 { char* str; }
 /* Line 193 of yacc.c.  */
-#line 149 "parser.tab.c"
+#line 153 "parser.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -158,7 +162,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 162 "parser.tab.c"
+#line 166 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -447,8 +451,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    44,    44,    48,    49,    53,    54,    55,    60,    65,
-      70,    75,    76,    80,    85,    86,    90,    98,    99,   103
+       0,    48,    48,    52,    53,    57,    60,    63,    69,    73,
+      77,    81,    82,    86,    90,    91,    95,   102,   103,   107
 };
 #endif
 
@@ -1364,56 +1368,62 @@ yyreduce:
   switch (yyn)
     {
         case 5:
-#line 53 "src/parser/parser.y"
-    { Fact* f=create_fact((yyvsp[(1) - (2)].str),args_array,arg_count); add_fact(f); arg_count=0; ;}
+#line 57 "src/parser/parser.y"
+    { Fact*  f = create_fact((yyvsp[(1) - (2)].str), args_array, arg_count);
+                  add_fact(f);
+                  arg_count = 0; ;}
     break;
 
   case 6:
-#line 54 "src/parser/parser.y"
-    { Rule* r=create_rule((yyvsp[(1) - (2)].str),args_array,arg_count,body_array,body_count); add_rule(r); arg_count=body_count=0; ;}
+#line 60 "src/parser/parser.y"
+    { Rule*  r = create_rule((yyvsp[(1) - (2)].str), args_array, arg_count, body_array, body_count);
+                  add_rule(r);
+                  arg_count = body_count = 0; ;}
     break;
 
   case 7:
-#line 55 "src/parser/parser.y"
-    { Query* q=create_query((yyvsp[(1) - (2)].str),args_array,arg_count); eval_query(q); arg_count=0; ;}
+#line 63 "src/parser/parser.y"
+    { Query* q = create_query((yyvsp[(1) - (2)].str), args_array, arg_count);
+                  eval_query(q);          /* enqueues; does not execute */
+                  arg_count = 0; ;}
     break;
 
   case 8:
-#line 60 "src/parser/parser.y"
-    { (yyval.str)=(yyvsp[(1) - (4)].str); ;}
+#line 69 "src/parser/parser.y"
+    { (yyval.str) = (yyvsp[(1) - (4)].str); ;}
     break;
 
   case 9:
-#line 65 "src/parser/parser.y"
-    { (yyval.str)=(yyvsp[(1) - (6)].str); ;}
+#line 73 "src/parser/parser.y"
+    { (yyval.str) = (yyvsp[(1) - (6)].str); ;}
     break;
 
   case 10:
-#line 70 "src/parser/parser.y"
-    { (yyval.str)=(yyvsp[(2) - (5)].str); ;}
+#line 77 "src/parser/parser.y"
+    { (yyval.str) = (yyvsp[(2) - (5)].str); ;}
     break;
 
   case 13:
-#line 80 "src/parser/parser.y"
-    { args_array[arg_count++]=(yyvsp[(1) - (1)].str); ;}
+#line 86 "src/parser/parser.y"
+    { args_array[arg_count++] = (yyvsp[(1) - (1)].str); ;}
     break;
 
   case 16:
-#line 90 "src/parser/parser.y"
-    { 
-        body_array[body_count++] = construct_body_item((yyvsp[(1) - (4)].str), temp_args, temp_arg_count);
-        temp_arg_count = 0;
-    ;}
+#line 95 "src/parser/parser.y"
+    {
+          body_array[body_count++] = construct_body_item((yyvsp[(1) - (4)].str), temp_args, temp_arg_count);
+          temp_arg_count = 0;
+      ;}
     break;
 
   case 19:
-#line 103 "src/parser/parser.y"
-    { temp_args[temp_arg_count++]=(yyvsp[(1) - (1)].str); ;}
+#line 107 "src/parser/parser.y"
+    { temp_args[temp_arg_count++] = (yyvsp[(1) - (1)].str); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1417 "parser.tab.c"
+#line 1427 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1627,7 +1637,11 @@ yyreturn:
 }
 
 
-#line 106 "src/parser/parser.y"
+#line 110 "src/parser/parser.y"
 
 
-void yyerror(const char* s) { fprintf(stderr,"Parse error: %s\n",s); }
+void yyerror(const char* s) {
+    fprintf(stderr, "Parse error at line %d: %s\n", yylineno, s);
+    parse_error_count++;
+}
+

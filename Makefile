@@ -1,15 +1,13 @@
-CC = gcc
-CFLAGS = -Wall -g
-LEX = flex
-YACC = bison
-TARGET = mypl
+CC      = gcc
+CFLAGS  = -Wall -Wextra -g -std=c99
+LEX     = flex
+YACC    = bison
+TARGET  = mypl
 
-# Source files
-SOURCES = Main.c src/ast/ast.c src/interpreter/interpreter..c lex.yy.c parser.tab.c
+SOURCES = Main.c src/ast/ast.c src/interpreter/interpreter.c lex.yy.c parser.tab.c
 OBJECTS = $(SOURCES:.c=.o)
 
-# Generated files
-LEX_SOURCE = lex.yy.c
+LEX_SOURCE  = lex.yy.c
 YACC_SOURCE = parser.tab.c
 YACC_HEADER = parser.tab.h
 
@@ -27,7 +25,11 @@ parser.tab.c parser.tab.h: src/parser/parser.y
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Build then run the full positive + negative test suite.
+test: $(TARGET)
+	@./tests/run_tests.sh
+
 clean:
 	rm -f $(OBJECTS) $(LEX_SOURCE) $(YACC_SOURCE) $(YACC_HEADER) $(TARGET)
 
-.PHONY: all clean
+.PHONY: all clean test

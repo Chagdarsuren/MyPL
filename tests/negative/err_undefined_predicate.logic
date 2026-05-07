@@ -1,0 +1,4 @@
+# Negative: query refers to an undefined predicate.
+# Parses fine, but proof should fail (false), not crash.
+parent(bat, bold).
+?- grandparent(bat, bold).

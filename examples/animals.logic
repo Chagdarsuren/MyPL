@@ -1,0 +1,62 @@
+# Animal taxonomy: classify and infer properties through rules.
+# Demonstrates multi-level inheritance, negation-by-absence (closed world)
+# and queries with variable bindings.
+
+# --- Base facts ---
+mammal(dog).
+mammal(cat).
+mammal(whale).
+mammal(bat).
+
+bird(eagle).
+bird(penguin).
+bird(sparrow).
+
+reptile(snake).
+reptile(lizard).
+
+# --- Capabilities (facts) ---
+can_fly(eagle).
+can_fly(sparrow).
+can_fly(bat).
+
+lives_in_water(whale).
+lives_in_water(fish).
+
+has_fur(dog).
+has_fur(cat).
+has_fur(bat).
+has_fur(whale).
+
+# --- Inferred categories (rules) ---
+animal(X) :- mammal(X).
+animal(X) :- bird(X).
+animal(X) :- reptile(X).
+
+# Warm-blooded if mammal or bird.
+warm_blooded(X) :- mammal(X).
+warm_blooded(X) :- bird(X).
+
+# A flying mammal: only bats here, but the rule is general.
+flying_mammal(X) :- mammal(X), can_fly(X).
+
+# A "weird" animal: warm-blooded but lives in water.
+aquatic_warm_blooded(X) :- warm_blooded(X), lives_in_water(X).
+
+# --- Queries ---
+?- animal(dog).
+?- animal(eagle).
+?- animal(snake).
+?- animal(fish).
+
+?- warm_blooded(whale).
+?- warm_blooded(snake).
+
+?- flying_mammal(bat).
+?- flying_mammal(eagle).
+
+?- aquatic_warm_blooded(whale).
+?- aquatic_warm_blooded(fish).
+
+# Variable-binding query: who is a flying mammal?
+?- flying_mammal(X).

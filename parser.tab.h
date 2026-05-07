@@ -62,7 +62,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 34 "src/parser/parser.y"
+#line 38 "src/parser/parser.y"
 { char* str; }
 /* Line 1529 of yacc.c.  */
 #line 69 "parser.tab.h"

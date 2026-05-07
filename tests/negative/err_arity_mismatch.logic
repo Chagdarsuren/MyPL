@@ -1,0 +1,4 @@
+# Negative: parent/2 declared, but query uses parent/1.
+# Parses fine, proof should fail (false).
+parent(bat, bold).
+?- parent(bat).

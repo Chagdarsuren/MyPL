@@ -1,66 +1,104 @@
-# MyPL
+# MyPL — Team 3 (Rule / Logic-like language)
 
-mini programming language
-F.CSB305 “ПРОГРАММЧЛАЛЫН ХЭЛНИЙ ЗАРЧМУУД” ХИЧЭЭЛИЙН БИЕ ДААЛТЫН АЖИЛ
+Course: F.CSB305 *Programming Language Principles*
+Topic: Design and implementation of a small programming language.
 
-Сэдэв: ЖИЖИГ ПРОГРАММЧЛАЛЫН ХЭЛНИЙ ДИЗАЙН БА ХЭРЭГЖИЛТ
+MyPL is a miniature Prolog. Programs are made of **facts**, **rules**, and
+**queries**; the proof engine answers queries by SLD resolution with
+chronological backtracking and per-activation variable renaming.
 
-Ажлын төрөл: Багийн бие даалт (5 баг, баг бүр 5–6 оюутан)
+## Build
 
-Оршил/Зорилго
+```bash
+make            # produces ./mypl
+make clean      # remove build artefacts
+make test       # build + run the full positive / negative test suite
+```
 
-Энэхүү бие даалтын зорилго нь программчлалын хэл гэдэг нь зөвхөн синтакс бус, харин хэлний дизайн, семантик, хэрэгжилтийн зарчмуудын нэгдэл болохыг ойлгуулахад оршино. Баг бүр өөрийн зохиосон нэг бүрэн жижиг программчлалын хэлийг дизайн хийж, хэрэгжүүлнэ.
+Requires `flex`, `bison`, and a C99 compiler.
 
-НЭГ. УДИРДАМЖ
+## CLI
 
-I. Ерөнхий шаардлага
+```
+mypl run   <file>     parse and evaluate queries
+mypl check <file>     parse only; report syntax errors and program stats
+mypl ast   <file>     parse and dump the AST
+mypl help             show this help
+mypl                  read source from stdin and run
+```
 
-· Баг бүр нэг бүрэн жижиг программчлалын хэл (mini‑PL) зохиож, хэрэгжүүлнэ.
+Example:
 
-· Хэл нь синтакс, дотоод дүрслэл (AST), семантик хэрэгжилттэй байна.
+```
+$ ./mypl run examples/family.logic
+?- parent(bat, bold).
+  true.
+?- ancestor(bat, dorj).
+  true.
+```
 
-· Хэлний дизайн ба хэрэгжилт нь багийн өөрсдийн бүтээл байх ёстой.
+## Language at a glance
 
-· Parser generator (ANTLR, Lark, PLY, Bison гэх мэт) ашиглахыг зөвшөөрнө.
+```prolog
+# facts
+parent(tom, bob).
+parent(bob, ann).
 
-· Parser нь source code‑оос AST үүсгэдэг байх ёстой.
+# rules
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).
 
-· Interpreter / evaluator / type checker‑ийг баг өөрсдөө хэрэгжүүлнэ.
+# queries (true/false; queries with variables also report bindings)
+?- ancestor(tom, ann).      # → true
+?- ancestor(X, ann).        # → true, X = tom
+```
 
-· Бэлэн interpreter, compiler, runtime engine ашиглахыг хориглоно.
+See `docs/syntax.md` for the EBNF grammar and `docs/semantics.md` for
+the proof procedure.
 
-· Grammar‑аас AST‑гүйгээр шууд гүйцэтгэх логик бичихийг хориглоно.
+## Repository layout
 
-· Test suite заавал: дор хаяж 20–25 жижиг тест, 5 нэгдсэн жишээ программ.
+```
+MyPL/
+├── Main.c                       # CLI entry point
+├── Makefile
+├── README.md                    # this file
+├── DESIGN.md                    # formal language spec
+├── IMPLEMENTATION.md            # implementation status / report
+├── docs/
+│   ├── syntax.md                # grammar reference
+│   ├── semantics.md             # proof procedure
+│   └── design.md                # implementation design notes
+├── src/
+│   ├── ast/         { ast.h, ast.c }
+│   ├── parser/      { lexer.l, parser.y }
+│   └── interpreter/ { interpreter.h, interpreter.c }
+├── examples/        { family, social, food, graph, animals }.logic
+└── tests/
+    ├── *.logic                  # 20 positive tests
+    ├── negative/*.logic         # negative tests (parse + runtime)
+    └── run_tests.sh             # full suite runner
+```
 
-· Тайланд хэлний зорилго, синтакс, AST, семантик, дизайн сонголт г.м хамарна.
+## Test status
 
-II. Хэлний дизайн ба семантик
+Run `make test`. Latest run:
 
-· Хэлний зорилго, хэрэглээний хүрээг тодорхой тайлбарласан байх.
+```
+=== Positive tests (tests/*.logic) ===
+=== Examples (examples/*.logic) ===
+=== Negative tests (tests/negative/*.logic) ===
 
-· Гол дизайн сонголтууд (state, control flow, typing, execution model)‑ыг тайлбарласан байх.
+passed: 31
+failed: 0
+```
 
-· Санаатайгаар оруулаагүй элементүүдийг шалтгаантай нь дурдсан байх.
+## Required concepts (Team 3 brief)
 
-· Семантик хэрэгжилт нь AST дээр тулгуурласан байх.
-
-· Parser‑ын semantic action дотор шууд гүйцэтгэх логик бичихийг хориглоно
-
-Баг 3 — Дүрэмд суурилсан хэл (Rule / Logic‑like language)
-
-Баримт ба дүрмээр үнэн худлыг тодорхойлдог хэл зохиож хэрэгжүүл.
-
-Заавал дэмжих ойлголтууд:
-
-· Fact
-
-· Rule
-
-· Query
-
-· Pattern matching / search
-
-Жишээ хэлбэр:
-
-parent(bat, dorj). ancestor(X,Y) :- parent(X,Y). ancestor(X,Y) :- parent(X,Z), ancestor(Z,Y)
+| Concept           | Where                                                        |
+|-------------------|--------------------------------------------------------------|
+| Fact              | `parent(tom, bob).` — see `examples/family.logic`            |
+| Rule              | `ancestor(X,Y) :- parent(X,Z), ancestor(Z,Y).`               |
+| Query             | `?- ancestor(tom, ann).`                                     |
+| Pattern matching  | Unification with variable renaming — `docs/semantics.md` §3 |
+| Search            | DFS with chronological backtracking — `docs/semantics.md` §4|

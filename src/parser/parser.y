@@ -6,27 +6,31 @@
 #include "src/interpreter/interpreter.h"
 
 extern int yylex();
+extern int yylineno;
 void yyerror(const char* s);
 
-// Temporary storage for parser actions
-char* args_array[10];
-int arg_count = 0;
+int parse_error_count = 0;
 
-char* temp_args[10];
-int temp_arg_count = 0;
+/* Parser action scratch buffers */
+static char* args_array[MAX_ARGS];
+static int   arg_count = 0;
 
-char* body_array[10];
-int body_count = 0;
+static char* temp_args[MAX_ARGS];
+static int   temp_arg_count = 0;
 
-// Helper function to construct body item string
-char* construct_body_item(char* name, char* args[], int count) {
-    char buf[256];
-    int pos = sprintf(buf, "%s(", name);
+static char* body_array[MAX_BODY];
+static int   body_count = 0;
+
+/* Helper: serialise a body item back to "name(a,b,c)" form. */
+static char* construct_body_item(const char* name, char* args[], int count) {
+    char buf[512];
+    int  pos = snprintf(buf, sizeof(buf), "%s(", name);
     for (int i = 0; i < count; i++) {
-        pos += sprintf(buf + pos, "%s", args[i]);
-        if (i < count - 1) pos += sprintf(buf + pos, ",");
+        pos += snprintf(buf + pos, sizeof(buf) - pos, "%s", args[i]);
+        if (i < count - 1)
+            pos += snprintf(buf + pos, sizeof(buf) - pos, ",");
     }
-    pos += sprintf(buf + pos, ")");
+    snprintf(buf + pos, sizeof(buf) - pos, ")");
     return strdup(buf);
 }
 %}
@@ -42,67 +46,70 @@ char* construct_body_item(char* name, char* args[], int count) {
 
 program:
     statements
-;
+    ;
 
 statements:
       statement statements
     | /* empty */
-;
+    ;
 
 statement:
-    fact DOT { Fact* f=create_fact($1,args_array,arg_count); add_fact(f); arg_count=0; }
-  | rule DOT { Rule* r=create_rule($1,args_array,arg_count,body_array,body_count); add_rule(r); arg_count=body_count=0; }
-  | query DOT { Query* q=create_query($1,args_array,arg_count); eval_query(q); arg_count=0; }
-;
+      fact  DOT { Fact*  f = create_fact($1, args_array, arg_count);
+                  add_fact(f);
+                  arg_count = 0; }
+    | rule  DOT { Rule*  r = create_rule($1, args_array, arg_count, body_array, body_count);
+                  add_rule(r);
+                  arg_count = body_count = 0; }
+    | query DOT { Query* q = create_query($1, args_array, arg_count);
+                  eval_query(q);          /* enqueues; does not execute */
+                  arg_count = 0; }
+    ;
 
-// Fact: IDENT(args)
 fact:
-    IDENT LPAREN arguments RPAREN { $$=$1; }
-;
+      IDENT LPAREN arguments RPAREN { $$ = $1; }
+    ;
 
-// Rule: IDENT(args) :- body_items
 rule:
-    IDENT LPAREN arguments RPAREN COLON_DASH body_items { $$=$1; }
-;
+      IDENT LPAREN arguments RPAREN COLON_DASH body_items { $$ = $1; }
+    ;
 
-// Query: ?- IDENT(args)
 query:
-    QUERY IDENT LPAREN arguments RPAREN { $$=$2; }
-;
+      QUERY IDENT LPAREN arguments RPAREN { $$ = $2; }
+    ;
 
-// Arguments list for heads
 arguments:
       argument
     | argument COMMA arguments
-;
+    ;
 
 argument:
-    IDENT { args_array[arg_count++]=$1; }
-;
+      IDENT { args_array[arg_count++] = $1; }
+    ;
 
-// Body items for rule
 body_items:
       body_item
     | body_item COMMA body_items
-;
+    ;
 
 body_item:
-    IDENT LPAREN body_arguments RPAREN { 
-        body_array[body_count++] = construct_body_item($1, temp_args, temp_arg_count);
-        temp_arg_count = 0;
-    }
-;
+      IDENT LPAREN body_arguments RPAREN {
+          body_array[body_count++] = construct_body_item($1, temp_args, temp_arg_count);
+          temp_arg_count = 0;
+      }
+    ;
 
-// Separate arguments for body items
 body_arguments:
       body_argument
     | body_argument COMMA body_arguments
-;
+    ;
 
 body_argument:
-    IDENT { temp_args[temp_arg_count++]=$1; }
-;
+      IDENT { temp_args[temp_arg_count++] = $1; }
+    ;
 
 %%
 
-void yyerror(const char* s) { fprintf(stderr,"Parse error: %s\n",s); }
+void yyerror(const char* s) {
+    fprintf(stderr, "Parse error at line %d: %s\n", yylineno, s);
+    parse_error_count++;
+}

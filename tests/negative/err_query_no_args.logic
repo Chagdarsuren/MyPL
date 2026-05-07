@@ -1,0 +1,3 @@
+# Negative: query with no arguments — grammar requires args.
+parent(bat, bold).
+?- parent().
